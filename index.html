@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Suffixes Quiz</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding-top: 70px; /* space for sticky header */
+        }
+        /* عداد ثابت في الأعلى */
+        .score-board {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        .stat-item { padding: 0 10px; }
+        .correct-val { color: #2ecc71; }
+        .wrong-val { color: #ff7675; }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .question-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button.option-btn {
+            padding: 12px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+        button.option-btn:hover:not([disabled]) {
+            background-color: var(--light);
+        }
+        button.correct {
+            background-color: var(--success) !important;
+            color: white;
+            border-color: var(--success);
+        }
+        button.wrong {
+            background-color: var(--danger) !important;
+            color: white;
+            border-color: var(--danger);
+        }
+        .hidden { display: none; }
+        #result-screen { text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="score-board">
+        <div class="stat-item">Correct: <span id="correct-count" class="correct-val">0</span></div>
+        <div class="stat-item">Wrong: <span id="wrong-count" class="wrong-val">0</span></div>
+        <div class="stat-item">Percentage: <span id="percentage">0%</span></div>
+    </div>
+
+    <div class="container">
+        <div id="quiz-container">
+            </div>
+        <div id="result-screen" class="hidden">
+            <h2>Quiz Completed!</h2>
+            <button onclick="location.reload()" style="padding: 15px 30px; cursor:pointer;">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // البيانات مستخرجة من الصور المرفقة
+        const quizData = [
+            { q: "What does the suffix '-al' mean?", a: "Pertaining to", o: ["Pertaining to", "Pain", "Small", "Inflammation"] },
+            { q: "What does the suffix '-algia' mean?", a: "Pain", o: ["Enzyme", "Pertaining to", "Pain", "Dilation"] },
+            { q: "What does the suffix '-ar' mean?", a: "Pertaining to", o: ["Condition", "Pertaining to", "Blood condition", "Flow"] },
+            { q: "What does the suffix '-ary' mean?", a: "Pertaining to", o: ["Pertaining to", "Sensation", "Surgical removal", "Vision"] },
+            { q: "What does the suffix '-ase' mean?", a: "Enzyme", o: ["Immature cell", "Enzyme", "Vomiting", "Skin"] },
+            { q: "What does the suffix '-atresia' mean?", a: "Absence of a normal body opening", o: ["Absence of a normal body opening", "Enlargement", "Softening", "Partial paralysis"] },
+            { q: "What does the suffix '-blast' mean?", a: "Immature cell", o: ["Record", "Mature cell", "Immature cell", "Tumor"] },
+            { q: "What does the suffix '-capnia' mean?", a: "Level of carbon dioxide", o: ["Level of oxygen", "Level of carbon dioxide", "Level of sugar", "Breathing"] },
+            { q: "What does the suffix '-derma' mean?", a: "Skin", o: ["Nerve", "Muscle", "Bone", "Skin"] },
+            { q: "What does the suffix '-ectasia' mean?", a: "Dilation", o: ["Dilation", "Contraction", "Rupture", "Narrowing"] },
+            { q: "What does the suffix '-ectomy' mean?", a: "Surgical removal", o: ["Surgical incision", "Surgical removal", "Surgical repair", "Surgical suturing"] },
+            { q: "What does the suffix '-edema' mean?", a: "Accumulation of fluid, swelling", o: ["Decreased fluid", "Accumulation of fluid, swelling", "Blood clot", "Infection"] },
+            { q: "What does the suffix '-emesis' mean?", a: "Vomiting", o: ["Sweating", "Breathing", "Vomiting", "Swallowing"] },
+            { q: "What does the suffix '-emia' mean?", a: "Blood condition", o: ["Skin condition", "Urine condition", "Heart condition", "Blood condition"] },
+            { q: "What does the suffix '-esthesia' mean?", a: "Sensation", o: ["Sensation", "Movement", "Vision", "Sound"] },
+            { q: "What does the suffix '-gram' mean?", a: "Record or picture", o: ["Process of recording", "Instrument for recording", "Record or picture", "Method of treatment"] },
+            { q: "What does the suffix '-graph' mean?", a: "An instrument used to record", o: ["A person who records", "An instrument used to record", "A record or picture", "A study of"] },
+            { q: "What does the suffix '-graphy' mean?", a: "Process of recording", o: ["Process of recording", "Instrument used to record", "Surgical removal", "Pain"] },
+            { q: "What does the suffix '-hemia' mean?", a: "Blood condition", o: ["Nerve condition", "Lung condition", "Blood condition", "Bone condition"] },
+            { q: "What does the suffix '-itis' mean?", a: "Inflammation", o: ["Tumor", "Pain", "Inflammation", "Softening"] },
+            { q: "What does the suffix '-lepsy' mean?", a: "Seizure", o: ["Sleep", "Seizure", "Speech", "Vision"] },
+            { q: "What does the suffix '-logy' mean?", a: "Study of", o: ["Specialist", "Instrument", "Study of", "Measurement"] },
+            { q: "What does the suffix '-logist' mean?", a: "one who specializes in the study of", o: ["one who specializes in the study of", "The process of studying", "A type of disease", "A surgical tool"] },
+            { q: "What does the suffix '-lysis' mean?", a: "loosening, dissolving", o: ["Binding", "Growth", "Hardening", "loosening, dissolving"] },
+            { q: "What does the suffix '-megaly' mean?", a: "enlargement", o: ["Shrinkage", "enlargement", "Inflammation", "Pain"] },
+            { q: "What does the suffix '-morph' mean?", a: "form; shape", o: ["Color", "Size", "form; shape", "Function"] },
+            { q: "What does the suffix '-necrosis' mean?", a: "death, the stage of dying", o: ["Life", "death, the stage of dying", "Healing", "Growth"] },
+            { q: "What does the suffix '-oma' mean?", a: "tumor", o: ["tumor", "Blood", "Inflammation", "Deficiency"] },
+            { q: "What does the suffix '-opia' mean?", a: "vision (condition)", o: ["Hearing", "vision (condition)", "Smell", "Taste"] },
+            { q: "What does the suffix '-oxia' mean?", a: "level of oxygen", o: ["Level of carbon dioxide", "Level of nitrogen", "level of oxygen", "Level of glucose"] },
+            { q: "What does the suffix '-paresis' mean?", a: "partial paralysis", o: ["Full paralysis", "partial paralysis", "Muscle spasm", "Lack of sensation"] },
+            { q: "What does the suffix '-penia' mean?", a: "decrease in, deficiency of", o: ["Increase in", "Excessive", "decrease in, deficiency of", "Normal level"] },
+            { q: "What does the suffix '-phagia' mean?", a: "swallow", o: ["Speech", "swallow", "Breathing", "Digestion"] },
+            { q: "What does the suffix '-phasia' mean?", a: "speech disorder", o: ["Vision disorder", "speech disorder", "Hearing disorder", "Movement disorder"] },
+            { q: "What does the suffix '-philia' mean?", a: "love", o: ["Fear", "love", "Hate", "Coldness"] },
+            { q: "What does the suffix '-phobia' mean?", a: "fear", o: ["fear", "love", "Anger", "Joy"] },
+            { q: "What does the suffix '-phonia' mean?", a: "sound, voice", o: ["Vision", "sound, voice", "Touch", "Smell"] },
+            { q: "What does the suffix '-phrenia' mean?", a: "mental disorder", o: ["Physical disorder", "mental disorder", "Heart disorder", "Skin disorder"] },
+            { q: "What does the suffix '-plegia' mean?", a: "paralysis", o: ["Weakness", "Pain", "paralysis", "Inflammation"] },
+            { q: "What does the suffix '-pnea' mean?", a: "breathing", o: ["Coughing", "Sneezing", "Swallowing", "breathing"] },
+            { q: "What does the suffix '-ptosis' mean?", a: "dropping down", o: ["dropping down", "Rising up", "Swelling", "Hardening"] },
+            { q: "What does the suffix '-rhage' mean?", a: "hemorrhage", o: ["Stoppage", "hemorrhage", "Normal flow", "Slow flow"] },
+            { q: "What does the suffix '-sarcoma' mean?", a: "tumor, cancer", o: ["Benign tumor", "tumor, cancer", "Infection", "Inflammation"] },
+            { q: "What does the suffix '-sclerosis' mean?", a: "hardening", o: ["Softening", "hardening", "Dilation", "Narrowing"] },
+            { q: "What does the suffix '-scope' mean?", a: "an instrument used to view", o: ["an instrument used to view", "Instrument used to cut", "Instrument used to measure", "Instrument used to record"] },
+            { q: "What does the suffix '-scopy' mean?", a: "the process of viewing with a scope", o: ["The process of recording", "the process of viewing with a scope", "The process of surgical removal", "The process of treatment"] },
+            { q: "What does the suffix '-sepsis' mean?", a: "infection", o: ["Cleanliness", "infection", "Healing", "Immunity"] },
+            { q: "What does the suffix '-spasm' mean?", a: "contraction", o: ["Relaxation", "contraction", "Dilation", "Paralysis"] },
+            { q: "What does the suffix '-stasis' mean?", a: "stoppage", o: ["Movement", "stoppage", "Speeding up", "Flowing"] },
+            { q: "What does the suffix '-stenosis' mean?", a: "constriction; narrowing", o: ["Widening", "constriction; narrowing", "Softening", "Rupturing"] },
+            { q: "What does the suffix '-stomy' mean?", a: "the surgical creation of a new opening", o: ["Surgical removal", "the surgical creation of a new opening", "Surgical incision", "Surgical repair"] },
+            { q: "What does the suffix '-tion' mean?", a: "condition", o: ["Person", "Tool", "condition", "Location"] },
+            { q: "What does the suffix '-tome' mean?", a: "instrument for incising (cutting)", o: ["instrument for incising (cutting)", "Instrument for viewing", "Instrument for measuring", "Instrument for recording"] },
+            { q: "What does the suffix '-uria' mean?", a: "urine", o: ["Blood", "urine", "Saliva", "Sweat"] },
+            { q: "Which suffix refers to 'Pain'?", a: "-algia", o: ["-al", "-algia", "-ase", "-emia"] },
+            { q: "Which suffix refers to 'Inflammation'?", a: "-itis", o: ["-oma", "-itis", "-osis", "-ptosis"] },
+            { q: "Which suffix refers to 'Paralysis'?", a: "-plegia", o: ["-plegia", "-pnea", "-phasia", "-phagia"] },
+            { q: "Which suffix means 'Study of'?", a: "-logy", o: ["-logist", "-logy", "-graphy", "-scopy"] },
+            { q: "Which suffix refers to 'Enlargement'?", a: "-megaly", o: ["-megaly", "-ectasia", "-trophy", "-plasia"] },
+            { q: "Which suffix means 'Surgical Removal'?", a: "-ectomy", o: ["-stomy", "-tomy", "-ectomy", "-plasty"] }
+        ];
+
+        let correct = 0;
+        let wrong = 0;
+
+        function updateStats() {
+            document.getElementById('correct-count').innerText = correct;
+            document.getElementById('wrong-count').innerText = wrong;
+            let total = correct + wrong;
+            let percent = total === 0 ? 0 : Math.round((correct / total) * 100);
+            document.getElementById('percentage').innerText = percent + "%";
+        }
+
+        function checkAnswer(btn, answer, correctAns) {
+            const card = btn.parentElement;
+            const buttons = card.querySelectorAll('button');
+            
+            buttons.forEach(b => b.disabled = true);
+
+            if (answer === correctAns) {
+                btn.classList.add('correct');
+                correct++;
+            } else {
+                btn.classList.add('wrong');
+                wrong++;
+                buttons.forEach(b => {
+                    if (b.innerText === correctAns) b.classList.add('correct');
+                });
+            }
+            updateStats();
+        }
+
+        function loadQuiz() {
+            const container = document.getElementById('quiz-container');
+            quizData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <div><strong>${index + 1}. ${item.q}</strong></div>
+                    <div class="options">
+                        ${item.o.map(opt => `<button class="option-btn" onclick="checkAnswer(this, '${opt}', '${item.a}')">${opt}</button>`).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        loadQuiz();
+    </script>
+</body>
+</html>
+
