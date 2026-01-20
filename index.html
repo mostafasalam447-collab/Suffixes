@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Quiz - Full Edition</title>
+    <title>Medical Quiz - New Style</title>
     <style>
         :root {
-            --primary-dark: #245963;   /* اللون البترولي من الصورة */
-            --accent-blue: #3498db;    /* لون دائرة الرقم */
-            --bg-body: #f4f7f6;         /* رمادي فاتح للخلفية */
-            --card-white: #ffffff;
+            --bg-page: #e3f2fd;        /* لون الخلفية لبني فاتح */
+            --card-bg: #ffffff;        /* البطاقات باللون الأبيض */
+            --question-color: #3498db; /* السؤال باللون اللبني */
+            --option-text: #000000;    /* الاختيارات بالأسود */
+            --primary-dark: #245963;   /* لون شريط الإحصائيات */
             --success: #2ecc71;
             --danger: #e74c3c;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg-body);
+            background-color: var(--bg-page);
             margin: 0;
             padding-top: 140px;
-            line-height: 1.5;
         }
 
         /* شريط الإحصائيات العلوي */
         .score-board {
             position: fixed;
             top: 0; left: 0; right: 0;
-            background: var(--card-white);
+            background: var(--card-bg);
             display: flex;
             justify-content: space-around;
             padding: 15px 10px;
@@ -53,57 +53,77 @@
             padding: 15px;
         }
 
-        /* كارت السؤال */
+        /* كارت السؤال الأبيض */
         .question-card {
-            background: var(--primary-dark);
-            padding: 25px;
+            background: var(--card-bg);
+            padding: 30px;
             margin-bottom: 25px;
             border-radius: 15px;
-            color: white;
             position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); /* ظل ناعم */
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .q-badge {
             position: absolute;
             right: 15px; top: 15px;
-            width: 38px; height: 38px;
-            background: var(--accent-blue);
+            width: 35px; height: 35px;
+            background: var(--question-color);
             color: white;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .question-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin: 25px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--question-color); /* نص السؤال لبني */
+            margin: 20px 0 25px 0;
             text-align: left;
             direction: ltr;
-            padding-right: 45px;
+            padding-right: 40px;
         }
 
-        /* الأزرار - التنسيق الهندسي */
-        .options-list { display: flex; flex-direction: column; gap: 10px; direction: ltr; }
+        /* قائمة الاختيارات */
+        .options-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            direction: ltr; 
+        }
 
         .option-btn {
-            padding: 14px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 20px;
+            background: #f8f9fa; /* خلفية رمادية فاتحة جداً للاختيار */
+            border: 1.5px solid #eceff1;
             border-radius: 12px;
-            color: white;
+            color: var(--option-text); /* نص الاختيار أسود */
             cursor: pointer;
             text-align: left;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            font-weight: 500;
             transition: 0.2s;
         }
 
-        .option-btn:hover:not([disabled]) { background: rgba(255, 255, 255, 0.2); }
+        .option-btn:hover:not([disabled]) { 
+            background: #e1f5fe; 
+            border-color: var(--question-color);
+        }
 
-        .correct { background-color: var(--success) !important; border-color: var(--success); }
-        .wrong { background-color: var(--danger) !important; border-color: var(--danger); }
-        .locked { pointer-events: none; opacity: 0.8; }
+        /* الألوان عند الإجابة */
+        .correct { 
+            background-color: var(--success) !important; 
+            border-color: var(--success) !important; 
+            color: white !important; 
+        }
+        .wrong { 
+            background-color: var(--danger) !important; 
+            border-color: var(--danger) !important; 
+            color: white !important; 
+        }
+        .locked { pointer-events: none; }
 
         @media (max-width: 500px) { body { padding-top: 130px; } }
     </style>
@@ -113,7 +133,7 @@
     <div class="score-board">
         <div class="stat-box"><span class="stat-value" id="total-val">60</span><span class="stat-label">الإجمالي</span></div>
         <div class="stat-box"><span class="stat-value" id="done-val">0</span><span class="stat-label">أجبت</span></div>
-        <div class="stat-box" style="background:#27ae60;"><span class="stat-value" id="correct-val">0</span><span class="stat-label">صحيحة</span></div>
+        <div class="stat-box" style="background:var(--success);"><span class="stat-value" id="correct-val">0</span><span class="stat-label">صحيحة</span></div>
         <div class="stat-box"><span class="stat-value" id="percent-val">0%</span><span class="stat-label">النجاح</span></div>
     </div>
 
