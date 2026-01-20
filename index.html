@@ -3,95 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Suffixes Quiz</title>
+    <title>Medical Quiz - Full Edition</title>
     <style>
         :root {
-            --primary-dark: #245963; 
-            --bg-light: #f4f7f6;
-            --text-main: #ffffff;
-            --card-bg: #ffffff;
+            --primary-dark: #245963;   /* اللون البترولي من الصورة */
+            --accent-blue: #3498db;    /* لون دائرة الرقم */
+            --bg-body: #f4f7f6;         /* رمادي فاتح للخلفية */
+            --card-white: #ffffff;
             --success: #2ecc71;
             --danger: #e74c3c;
-            --accent-blue: #3498db;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-light);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-body);
             margin: 0;
-            padding-top: 130px; 
+            padding-top: 140px;
+            line-height: 1.5;
         }
 
-        /* شريط العداد العلوي */
+        /* شريط الإحصائيات العلوي */
         .score-board {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
+            top: 0; left: 0; right: 0;
+            background: var(--card-white);
             display: flex;
             justify-content: space-around;
             padding: 15px 10px;
             z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             gap: 8px;
         }
 
         .stat-box {
             background: var(--primary-dark);
             color: white;
-            border-radius: 6px;
-            padding: 8px 5px;
+            border-radius: 10px;
+            padding: 8px;
             flex: 1;
             text-align: center;
         }
 
-        .stat-label {
-            display: block;
-            font-size: 0.7rem;
-            margin-top: 4px;
-            opacity: 0.8;
-        }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            display: block;
-        }
+        .stat-value { font-size: 1.1rem; font-weight: bold; display: block; }
+        .stat-label { font-size: 0.7rem; opacity: 0.8; }
 
         .container {
-            max-width: 600px;
+            max-width: 650px;
             margin: auto;
             padding: 15px;
         }
 
+        /* كارت السؤال */
         .question-card {
             background: var(--primary-dark);
             padding: 25px;
             margin-bottom: 25px;
-            border-radius: 12px;
+            border-radius: 15px;
             color: white;
             position: relative;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
 
-        .q-circle {
+        .q-badge {
             position: absolute;
-            right: 15px;
-            top: 15px;
-            width: 38px;
-            height: 38px;
+            right: 15px; top: 15px;
+            width: 38px; height: 38px;
             background: var(--accent-blue);
             color: white;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-weight: bold;
         }
 
         .question-text {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 600;
             margin: 25px 0;
             text-align: left;
@@ -99,56 +84,40 @@
             padding-right: 45px;
         }
 
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            direction: ltr;
-        }
+        /* الأزرار - التنسيق الهندسي */
+        .options-list { display: flex; flex-direction: column; gap: 10px; direction: ltr; }
 
         .option-btn {
             padding: 14px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
             background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
             cursor: pointer;
-            transition: all 0.2s;
             text-align: left;
             font-size: 1rem;
-            color: white;
+            transition: 0.2s;
         }
 
-        .option-btn:hover:not([disabled]) {
-            background: rgba(255, 255, 255, 0.15);
-        }
+        .option-btn:hover:not([disabled]) { background: rgba(255, 255, 255, 0.2); }
 
-        .option-btn.correct { background-color: var(--success) !important; border-color: var(--success); }
-        .option-btn.wrong { background-color: var(--danger) !important; border-color: var(--danger); }
-        .disabled { pointer-events: none; opacity: 0.7; }
+        .correct { background-color: var(--success) !important; border-color: var(--success); }
+        .wrong { background-color: var(--danger) !important; border-color: var(--danger); }
+        .locked { pointer-events: none; opacity: 0.8; }
+
+        @media (max-width: 500px) { body { padding-top: 130px; } }
     </style>
 </head>
 <body>
 
     <div class="score-board">
-        <div class="stat-box">
-            <span class="stat-value" id="total-count">0</span>
-            <span class="stat-label">الإجمالي</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-value" id="answered-count">0</span>
-            <span class="stat-label">أجبت</span>
-        </div>
-        <div class="stat-box" style="background: #27ae60;">
-            <span class="stat-value" id="correct-count">0</span>
-            <span class="stat-label">صحيحة</span>
-        </div>
-        <div class="stat-box">
-            <span class="stat-value" id="percentage">0%</span>
-            <span class="stat-label">النجاح</span>
-        </div>
+        <div class="stat-box"><span class="stat-value" id="total-val">60</span><span class="stat-label">الإجمالي</span></div>
+        <div class="stat-box"><span class="stat-value" id="done-val">0</span><span class="stat-label">أجبت</span></div>
+        <div class="stat-box" style="background:#27ae60;"><span class="stat-value" id="correct-val">0</span><span class="stat-label">صحيحة</span></div>
+        <div class="stat-box"><span class="stat-value" id="percent-val">0%</span><span class="stat-label">النجاح</span></div>
     </div>
 
-    <div class="container" id="quiz-container"></div>
+    <div class="container" id="quiz-box"></div>
 
     <script>
         const quizData = [
@@ -214,57 +183,46 @@
             { q: "Which suffix means 'Surgical Removal'?", a: "-ectomy", o: ["-stomy", "-tomy", "-ectomy", "-plasty"] }
         ];
 
-        let correct = 0;
-        let wrong = 0;
+        let score = 0, done = 0;
 
         function updateStats() {
-            const answered = correct + wrong;
-            document.getElementById('correct-count').innerText = correct;
-            document.getElementById('answered-count').innerText = answered;
-            document.getElementById('total-count').innerText = quizData.length;
-            let percent = answered === 0 ? 0 : Math.round((correct / answered) * 100);
-            document.getElementById('percentage').innerText = percent + "%";
+            document.getElementById('done-val').innerText = done;
+            document.getElementById('correct-val').innerText = score;
+            document.getElementById('total-val').innerText = quizData.length;
+            const p = done === 0 ? 0 : Math.round((score/done)*100);
+            document.getElementById('percent-val').innerText = p + "%";
         }
 
-        function handleAnswer(btn, selected, correctAns, qIndex) {
-            const grid = document.getElementById(`grid-${qIndex}`);
-            if (grid.classList.contains('disabled')) return;
-
-            if (selected === correctAns) {
-                btn.classList.add('correct');
-                correct++;
-            } else {
+        function handleBtn(btn, isCorrect, correctTxt, qIdx) {
+            const group = document.getElementById(`g-${qIdx}`);
+            if (group.classList.contains('locked')) return;
+            done++;
+            if (isCorrect) { btn.classList.add('correct'); score++; }
+            else { 
                 btn.classList.add('wrong');
-                wrong++;
-                const buttons = grid.querySelectorAll('.option-btn');
-                buttons.forEach(b => {
-                    if (b.innerText === correctAns) b.classList.add('correct');
-                });
+                group.querySelectorAll('.option-btn').forEach(b => { if(b.innerText === correctTxt) b.classList.add('correct'); });
             }
-            grid.classList.add('disabled');
+            group.classList.add('locked');
             updateStats();
         }
 
-        function initQuiz() {
-            const container = document.getElementById('quiz-container');
-            quizData.forEach((item, index) => {
+        function init() {
+            const box = document.getElementById('quiz-box');
+            quizData.forEach((item, i) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
                 card.innerHTML = `
-                    <div class="q-circle">${index + 1}</div>
+                    <div class="q-badge">${i+1}</div>
                     <div class="question-text">${item.q}</div>
-                    <div class="options-grid" id="grid-${index}">
-                        ${item.o.map(opt => `
-                            <button class="option-btn" onclick="handleAnswer(this, '${opt.replace(/'/g, "\\'")}', '${item.a.replace(/'/g, "\\'")}', ${index})">${opt}</button>
-                        `).join('')}
+                    <div class="options-list" id="g-${i}">
+                        ${item.o.map(opt => `<button class="option-btn" onclick="handleBtn(this, '${opt.replace(/'/g,"\\'")}'==='${item.a.replace(/'/g,"\\'")}', '${item.a.replace(/'/g,"\\'")}', ${i})">${opt}</button>`).join('')}
                     </div>
                 `;
-                container.appendChild(card);
+                box.appendChild(card);
             });
             updateStats();
         }
-
-        initQuiz();
+        init();
     </script>
 </body>
 </html>
