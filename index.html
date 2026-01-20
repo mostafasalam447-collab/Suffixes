@@ -1,105 +1,175 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Suffixes Quiz</title>
+    <title>Medical Suffixes Quiz - Relaxing Eye Edition</title>
     <style>
         :root {
-            --primary: #2c3e50;
+            --bg-color: #f0f2f5; /* لون مريح للعين */
+            --card-bg: #ffffff;
+            --primary-blue: #00d2ff;
+            --text-dark: #34495e;
             --success: #27ae60;
             --danger: #e74c3c;
-            --light: #ecf0f1;
+            --accent: #ebf5fb;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
             margin: 0;
-            padding-top: 70px; /* space for sticky header */
+            padding-top: 90px;
         }
-        /* عداد ثابت في الأعلى */
+
+        /* شريط العداد المطور */
         .score-board {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 50px;
-            background: var(--primary);
-            color: white;
+            height: 70px;
+            background: #ffffff;
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--primary-blue);
+        }
+
+        .stat-box {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
             font-weight: bold;
         }
-        .stat-item { padding: 0 10px; }
-        .correct-val { color: #2ecc71; }
-        .wrong-val { color: #ff7675; }
+
+        .correct-val { color: var(--success); }
+        .wrong-val { color: var(--danger); }
+        .total-val { color: var(--primary-blue); }
 
         .container {
             max-width: 800px;
             margin: auto;
             padding: 20px;
         }
+
         .question-card {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            position: relative;
+            border: 1px solid #e1e8ed;
         }
-        .options {
-            display: grid;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        button.option-btn {
-            padding: 12px;
-            border: 2px solid var(--light);
-            background: white;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: left;
-            transition: 0.3s;
-            font-size: 16px;
-        }
-        button.option-btn:hover:not([disabled]) {
-            background-color: var(--light);
-        }
-        button.correct {
-            background-color: var(--success) !important;
+
+        /* الدائرة اللبني للترقيم منفصلة عن السؤال */
+        .q-circle {
+            position: absolute;
+            right: -20px;
+            top: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--primary-blue);
             color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            margin-right: 35px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            direction: ltr;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid #f0f2f5;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            border-color: var(--primary-blue);
+            background: var(--accent);
+        }
+
+        .option-btn.correct {
+            background-color: var(--success) !important;
+            color: white !important;
             border-color: var(--success);
         }
-        button.wrong {
+
+        .option-btn.wrong {
             background-color: var(--danger) !important;
-            color: white;
+            color: white !important;
             border-color: var(--danger);
         }
-        .hidden { display: none; }
-        #result-screen { text-align: center; padding: 50px; }
+
+        .disabled { pointer-events: none; }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .q-circle { right: -10px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="score-board">
-        <div class="stat-item">Correct: <span id="correct-count" class="correct-val">0</span></div>
-        <div class="stat-item">Wrong: <span id="wrong-count" class="wrong-val">0</span></div>
-        <div class="stat-item">Percentage: <span id="percentage">0%</span></div>
-    </div>
-
-    <div class="container">
-        <div id="quiz-container">
-            </div>
-        <div id="result-screen" class="hidden">
-            <h2>Quiz Completed!</h2>
-            <button onclick="location.reload()" style="padding: 15px 30px; cursor:pointer;">Restart Quiz</button>
+        <div class="stat-box">
+            <span class="stat-label">صح</span>
+            <span id="correct-count" class="stat-value correct-val">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">خطأ</span>
+            <span id="wrong-count" class="stat-value wrong-val">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">الإجمالي</span>
+            <span id="total-count" class="stat-value total-val">0 / 60</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">النسبة</span>
+            <span id="percentage" class="stat-value">0%</span>
         </div>
     </div>
 
+    <div class="container" id="quiz-container"></div>
+
     <script>
-        // البيانات مستخرجة من الصور المرفقة
         const quizData = [
             { q: "What does the suffix '-al' mean?", a: "Pertaining to", o: ["Pertaining to", "Pain", "Small", "Inflammation"] },
             { q: "What does the suffix '-algia' mean?", a: "Pain", o: ["Enzyme", "Pertaining to", "Pain", "Dilation"] },
@@ -165,22 +235,29 @@
 
         let correct = 0;
         let wrong = 0;
+        const totalQuestions = quizData.length;
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
 
         function updateStats() {
+            const answered = correct + wrong;
             document.getElementById('correct-count').innerText = correct;
             document.getElementById('wrong-count').innerText = wrong;
-            let total = correct + wrong;
-            let percent = total === 0 ? 0 : Math.round((correct / total) * 100);
+            document.getElementById('total-count').innerText = `${answered} / ${totalQuestions}`;
+            let percent = answered === 0 ? 0 : Math.round((correct / answered) * 100);
             document.getElementById('percentage').innerText = percent + "%";
         }
 
-        function checkAnswer(btn, answer, correctAns) {
-            const card = btn.parentElement;
-            const buttons = card.querySelectorAll('button');
-            
-            buttons.forEach(b => b.disabled = true);
+        function handleAnswer(btn, selected, correctAns, qIndex) {
+            const grid = document.getElementById(`grid-${qIndex}`);
+            if (grid.classList.contains('disabled')) return;
 
-            if (answer === correctAns) {
+            const buttons = grid.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.classList.add('disabled'));
+
+            if (selected === correctAns) {
                 btn.classList.add('correct');
                 correct++;
             } else {
@@ -190,26 +267,31 @@
                     if (b.innerText === correctAns) b.classList.add('correct');
                 });
             }
+            grid.classList.add('disabled');
             updateStats();
         }
 
-        function loadQuiz() {
+        function initQuiz() {
             const container = document.getElementById('quiz-container');
             quizData.forEach((item, index) => {
+                const shuffledOptions = shuffle([...item.o]);
                 const card = document.createElement('div');
                 card.className = 'question-card';
                 card.innerHTML = `
-                    <div><strong>${index + 1}. ${item.q}</strong></div>
-                    <div class="options">
-                        ${item.o.map(opt => `<button class="option-btn" onclick="checkAnswer(this, '${opt}', '${item.a}')">${opt}</button>`).join('')}
+                    <div class="q-circle">${index + 1}</div>
+                    <div class="question-text">${item.q}</div>
+                    <div class="options-grid" id="grid-${index}">
+                        ${shuffledOptions.map(opt => `
+                            <button class="option-btn" onclick="handleAnswer(this, '${opt}', '${item.a}', ${index})">${opt}</button>
+                        `).join('')}
                     </div>
                 `;
                 container.appendChild(card);
             });
+            updateStats();
         }
 
-        loadQuiz();
+        initQuiz();
     </script>
 </body>
 </html>
-
