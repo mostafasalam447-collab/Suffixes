@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Quiz - New Style</title>
+    <title>Medical Quiz - Comfortable Style</title>
     <style>
         :root {
-            --bg-page: #e3f2fd;        /* لون الخلفية لبني فاتح */
-            --card-bg: #ffffff;        /* البطاقات باللون الأبيض */
-            --question-color: #3498db; /* السؤال باللون اللبني */
-            --option-text: #000000;    /* الاختيارات بالأسود */
-            --primary-dark: #245963;   /* لون شريط الإحصائيات */
+            --bg-page: #e3f2fd;        /* خلفية لبني فاتح */
+            --card-bg: #f5f7f8;        /* أبيض خافت (Off-white) لتقليل السطوع */
+            --question-color: #3498db; /* لون السؤال والعدادات (لبني) */
+            --option-text: #2c3e50;    /* أسود مائل للرمادي لراحة العين */
             --success: #2ecc71;
             --danger: #e74c3c;
         }
@@ -22,21 +21,21 @@
             padding-top: 140px;
         }
 
-        /* شريط الإحصائيات العلوي */
+        /* شريط العدادات - تم تغيير اللون للبني */
         .score-board {
             position: fixed;
             top: 0; left: 0; right: 0;
-            background: var(--card-bg);
+            background: #ffffff;
             display: flex;
             justify-content: space-around;
             padding: 15px 10px;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             gap: 8px;
         }
 
         .stat-box {
-            background: var(--primary-dark);
+            background: var(--question-color); /* لون لبني للعدادات */
             color: white;
             border-radius: 10px;
             padding: 8px;
@@ -45,7 +44,7 @@
         }
 
         .stat-value { font-size: 1.1rem; font-weight: bold; display: block; }
-        .stat-label { font-size: 0.7rem; opacity: 0.8; }
+        .stat-label { font-size: 0.7rem; opacity: 0.9; }
 
         .container {
             max-width: 650px;
@@ -53,14 +52,14 @@
             padding: 15px;
         }
 
-        /* كارت السؤال الأبيض */
+        /* كارت السؤال - أبيض خافت */
         .question-card {
             background: var(--card-bg);
             padding: 30px;
             margin-bottom: 25px;
             border-radius: 15px;
             position: relative;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05); /* ظل ناعم */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid rgba(0,0,0,0.05);
         }
 
@@ -73,33 +72,26 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
         }
 
         .question-text {
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--question-color); /* نص السؤال لبني */
+            color: var(--question-color); /* سؤال لبني */
             margin: 20px 0 25px 0;
             text-align: left;
             direction: ltr;
             padding-right: 40px;
         }
 
-        /* قائمة الاختيارات */
-        .options-list { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            direction: ltr; 
-        }
+        .options-list { display: flex; flex-direction: column; gap: 12px; direction: ltr; }
 
         .option-btn {
             padding: 15px 20px;
-            background: #f8f9fa; /* خلفية رمادية فاتحة جداً للاختيار */
-            border: 1.5px solid #eceff1;
+            background: #ffffff; /* خلفية بيضاء سادة للاختيار */
+            border: 1.5px solid #d1d9e0;
             border-radius: 12px;
-            color: var(--option-text); /* نص الاختيار أسود */
+            color: var(--option-text); /* نص أسود */
             cursor: pointer;
             text-align: left;
             font-size: 1.05rem;
@@ -112,17 +104,8 @@
             border-color: var(--question-color);
         }
 
-        /* الألوان عند الإجابة */
-        .correct { 
-            background-color: var(--success) !important; 
-            border-color: var(--success) !important; 
-            color: white !important; 
-        }
-        .wrong { 
-            background-color: var(--danger) !important; 
-            border-color: var(--danger) !important; 
-            color: white !important; 
-        }
+        .correct { background-color: var(--success) !important; border-color: var(--success) !important; color: white !important; }
+        .wrong { background-color: var(--danger) !important; border-color: var(--danger) !important; color: white !important; }
         .locked { pointer-events: none; }
 
         @media (max-width: 500px) { body { padding-top: 130px; } }
@@ -208,7 +191,6 @@
         function updateStats() {
             document.getElementById('done-val').innerText = done;
             document.getElementById('correct-val').innerText = score;
-            document.getElementById('total-val').innerText = quizData.length;
             const p = done === 0 ? 0 : Math.round((score/done)*100);
             document.getElementById('percent-val').innerText = p + "%";
         }
